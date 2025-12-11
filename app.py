@@ -1,0 +1,1 @@
+# 1 Goof (Lower Risk) 0 Bad (Higher Risk)
