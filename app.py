@@ -108,7 +108,7 @@ with st.form("credit_form"):
     saving_accounts = st.selectbox("Saving Accounts", ["little", "moderate", "rich"])
     checking_account = st.selectbox("Checking Account", ["little", "moderate", "rich"])
     credit_amount = st.number_input("Credit Amount", min_value=0, value=1000)
-    duration = st.number_input("Duration (months)", min_value=1, max_value=12, value=12)
+    duration = st.number_input("Duration (months)", min_value=1, value=12)
 
     submitted = st.form_submit_button("Predict Risk")
 
