@@ -1,8 +1,7 @@
 import streamlit as st
-import pandas as pd
-import joblib
+from backend import predict_credit_risk
 
-#Page Style
+#Page Style 
 page_style = """
 <style>
 [data-testid="stAppViewContainer"] { background-color: #dbe9f4; }
@@ -12,7 +11,6 @@ page_style = """
     font-weight: 800; 
     color: #1f3c88; 
     text-align: center; 
-    margin-bottom: 5px; 
 }
 
 .subtitle { 
@@ -20,34 +18,6 @@ page_style = """
     color: #444; 
     text-align: center; 
     margin-bottom: 25px; 
-}
-
-div[data-baseweb="input"] input {
-    background-color: #e0f0ff !important;
-    border: 2px solid #9fc9ff !important;
-    border-radius: 6px !important;
-    font-weight: 600 !important;
-    color: #1f3c88 !important;
-}
-
-div[data-baseweb="select"] div[role="combobox"] {
-    background-color: #e0f0ff !important;
-    border: 2px solid #9fc9ff !important;
-    border-radius: 6px !important;
-    padding-right: 30px !important;
-    font-weight: 600 !important;
-    color: #1f3c88 !important;
-    position: relative;
-}
-
-div[data-baseweb="select"] div[role="combobox"]::after {
-    content: "▼";
-    color: #1f3c88;
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
 }
 
 .pred-box { 
@@ -74,11 +44,6 @@ div[data-baseweb="select"] div[role="combobox"]::after {
 """
 st.markdown(page_style, unsafe_allow_html=True)
 
-#Load Model & Encoders
-model = joblib.load("best_credit_model.pkl")
-target_encoder = joblib.load("target_encoder.pkl")
-model_columns = joblib.load("model_columns.pkl")  # saved from training
-
 #Header
 st.markdown('<div class="title">Credit Risk Prediction</div>', unsafe_allow_html=True)
 st.markdown(
@@ -86,9 +51,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-#Input Form
+#Input Form 
 with st.form("credit_form"):
-
     age = st.number_input("Age", min_value=18, max_value=75, value=30)
     sex = st.selectbox("Sex", ["male", "female"])
     job = st.number_input("Job (0–3)", min_value=0, max_value=3, value=1)
@@ -104,36 +68,16 @@ with st.form("credit_form"):
 
     submitted = st.form_submit_button("Predict Risk")
 
-#Predictions
+#Prediction 
 if submitted:
     try:
-        # Raw input dataframe (same as training BEFORE encoding)
-        input_raw = pd.DataFrame({
-            "Age": [age],
-            "Sex": [sex],
-            "Job": [job],
-            "Housing": [housing],
-            "Saving accounts": [saving_accounts],
-            "Checking account": [checking_account],
-            "Credit amount": [credit_amount],
-            "Duration": [duration]
-        })
-
-        # One-hot encode (same method used in training)
-        input_encoded = pd.get_dummies(input_raw, drop_first=True)
-
-        # Align columns with training data
-        input_encoded = input_encoded.reindex(
-            columns=model_columns,
-            fill_value=0
+        result = predict_credit_risk(
+            age, sex, job, housing,
+            saving_accounts, checking_account,
+            credit_amount, duration
         )
 
-        # Prediction
-        pred = model.predict(input_encoded)[0]
-        pred_label = target_encoder.inverse_transform([pred])[0]
-
-        # Output
-        if pred_label.lower() == "good":
+        if result.lower() == "good":
             st.markdown(
                 '<div class="pred-box good">Prediction: GOOD Credit Risk</div>',
                 unsafe_allow_html=True
