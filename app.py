@@ -1,58 +1,29 @@
 import streamlit as st
-from backend import predict_credit_risk
+import pandas as pd
+import joblib
 
-#Page Style 
-page_style = """
-<style>
-[data-testid="stAppViewContainer"] { background-color: #dbe9f4; }
 
-.title { 
-    font-size: 38px; 
-    font-weight: 800; 
-    color: #1f3c88; 
-    text-align: center; 
-}
+def load_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-.subtitle { 
-    font-size: 17px; 
-    color: #444; 
-    text-align: center; 
-    margin-bottom: 25px; 
-}
+load_css("style.css")
 
-.pred-box { 
-    padding: 18px; 
-    border-radius: 12px; 
-    text-align: center; 
-    font-size: 22px; 
-    font-weight: 700; 
-    margin-top: 20px; 
-}
 
-.good { 
-    background-color: #b6e2ff; 
-    color: #045275; 
-    border: 2px solid #045275; 
-}
+model = joblib.load("best_credit_model.pkl")
+target_encoder = joblib.load("target_encoder.pkl")
+model_columns = joblib.load("model_columns.pkl")
 
-.bad { 
-    background-color: #ffd6d6; 
-    color: #8b1a1a; 
-    border: 2px solid #8b1a1a; 
-}
-</style>
-"""
-st.markdown(page_style, unsafe_allow_html=True)
 
-#Header
 st.markdown('<div class="title">Credit Risk Prediction</div>', unsafe_allow_html=True)
 st.markdown(
     '<div class="subtitle">Fill in the details below to predict credit risk</div>',
     unsafe_allow_html=True
 )
 
-#Input Form 
+
 with st.form("credit_form"):
+
     age = st.number_input("Age", min_value=18, max_value=75, value=30)
     sex = st.selectbox("Sex", ["male", "female"])
     job = st.number_input("Job (0–3)", min_value=0, max_value=3, value=1)
@@ -68,16 +39,30 @@ with st.form("credit_form"):
 
     submitted = st.form_submit_button("Predict Risk")
 
-#Prediction 
+
 if submitted:
     try:
-        result = predict_credit_risk(
-            age, sex, job, housing,
-            saving_accounts, checking_account,
-            credit_amount, duration
+        input_raw = pd.DataFrame({
+            "Age": [age],
+            "Sex": [sex],
+            "Job": [job],
+            "Housing": [housing],
+            "Saving accounts": [saving_accounts],
+            "Checking account": [checking_account],
+            "Credit amount": [credit_amount],
+            "Duration": [duration]
+        })
+
+        input_encoded = pd.get_dummies(input_raw, drop_first=True)
+        input_encoded = input_encoded.reindex(
+            columns=model_columns,
+            fill_value=0
         )
 
-        if result.lower() == "good":
+        pred = model.predict(input_encoded)[0]
+        pred_label = target_encoder.inverse_transform([pred])[0]
+
+        if pred_label.lower() == "good":
             st.markdown(
                 '<div class="pred-box good">Prediction: GOOD Credit Risk</div>',
                 unsafe_allow_html=True

@@ -1,0 +1,74 @@
+
+[data-testid="stAppViewContainer"] {
+    background-color: #dbe9f4;
+}
+
+
+.title {
+    font-size: 38px;
+    font-weight: 800;
+    color: #1f3c88;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+
+.subtitle {
+    font-size: 17px;
+    color: #444;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+
+div[data-baseweb="input"] input {
+    background-color: #e0f0ff !important;
+    border: 2px solid #9fc9ff !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+    color: #1f3c88 !important;
+}
+
+div[data-baseweb="select"] div[role="combobox"] {
+    background-color: #e0f0ff !important;
+    border: 2px solid #9fc9ff !important;
+    border-radius: 6px !important;
+    padding-right: 30px !important;
+    font-weight: 600 !important;
+    color: #1f3c88 !important;
+    position: relative;
+}
+
+div[data-baseweb="select"] div[role="combobox"]::after {
+   
+    color: #1f3c88;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+
+.pred-box {
+    padding: 18px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    margin-top: 20px;
+}
+
+
+.good {
+    background-color: #b6e2ff;
+    color: #045275;
+    border: 2px solid #045275;
+}
+
+
+.bad {
+    background-color: #ffd6d6;
+    color: #8b1a1a;
+    border: 2px solid #8b1a1a;
+}
